@@ -47,40 +47,36 @@ void train() {
   weightN3[1] = (double) rand() / (double) RAND_MAX;
   bwN3 = (double) rand() / (double) RAND_MAX;
 
-  int epoch = 0;
-  while(epoch < 8000) {
-    ++epoch;
-    //for(int i = 0; i < 4; ++i) {
-      int i = random_range(1, 4);
-      inputsN1[0] = in[i][0];
-      inputsN1[1] = in[i][1];
-      inputsN2[0] = in[i][0];
-      inputsN2[1] = in[i][1];
+  for(int epoch = 0; epoch < 2000 * 4; epoch++) {
+    int i = random_range(1, 4);
+    inputsN1[0] = in[i][0];
+    inputsN1[1] = in[i][1];
+    inputsN2[0] = in[i][0];
+    inputsN2[1] = in[i][1];
 
-      inputsN3[0] = output(inputsN1, weightN1, bwN1);
-      inputsN3[1] = output(inputsN2, weightN2, bwN2);
+    inputsN3[0] = output(inputsN1, weightN1, bwN1);
+    inputsN3[1] = output(inputsN2, weightN2, bwN2);
 
-      double outputN3 = output(inputsN3, weightN3, bwN3);
+    double outputN3 = output(inputsN3, weightN3, bwN3);
 
-      printf("%d XOR %d = ", (int)in[i][0], (int)in[i][1]);
-      printf("%f (%d)\n", outputN3, (int)res[i]);
+    printf("%d XOR %d = ", (int)in[i][0], (int)in[i][1]);
+    printf("%f (%d)\n", outputN3, (int)res[i]);
 
-      errN3 = derivative(outputN3) * (res[i] - outputN3);
-      weightN3[0] += errN3 * inputsN3[0];
-      weightN3[1] += errN3 * inputsN3[1];
-      bwN3 += errN3;
+    errN3 = derivative(outputN3) * (res[i] - outputN3);
+    weightN3[0] += errN3 * inputsN3[0];
+    weightN3[1] += errN3 * inputsN3[1];
+    bwN3 += errN3;
 
-      errN1 = derivative(inputsN3[0]) * errN3 * weightN3[0];
-      errN2 = derivative(inputsN3[1]) * errN3 * weightN3[1];
+    errN1 = derivative(inputsN3[0]) * errN3 * weightN3[0];
+    errN2 = derivative(inputsN3[1]) * errN3 * weightN3[1];
 
-      weightN1[0] += errN1 * inputsN1[0];
-      weightN1[1] += errN1 * inputsN1[1];
-      bwN1 += errN1;
+    weightN1[0] += errN1 * inputsN1[0];
+    weightN1[1] += errN1 * inputsN1[1];
+    bwN1 += errN1;
 
-      weightN2[0] += errN2 * inputsN2[0];
-      weightN2[1] += errN2 * inputsN2[1];
-      bwN2 += errN2;
-    //}
+    weightN2[0] += errN2 * inputsN2[0];
+    weightN2[1] += errN2 * inputsN2[1];
+    bwN2 += errN2;
   }
 }
 
