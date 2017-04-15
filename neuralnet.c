@@ -74,11 +74,11 @@ void train() {
       errN2 = derivative(inputsN3[1]) * errN3 * weightN3[1];
 
       weightN1[0] += errN1 * inputsN1[0];
-      weightN1[1] += errN1 * inputsN1[0];
+      weightN1[1] += errN1 * inputsN1[1];
       bwN1 += errN1;
 
       weightN2[0] += errN2 * inputsN2[0];
-      weightN2[1] += errN2 * inputsN2[0];
+      weightN2[1] += errN2 * inputsN2[1];
       bwN2 += errN2;
     //}
   }
