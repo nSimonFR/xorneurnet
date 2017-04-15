@@ -1,85 +1,131 @@
-/* neuralnet.c */
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
 
-# include <stdlib.h>
-# include <stdio.h>
-# include <math.h>
+#define LAYER_SIZE 2
 
-double sigmoid(double x) {
-  return 1 / (1 + exp(-x));
+typedef struct s_input_test
+{
+  double inputs[LAYER_SIZE];
+  double result;
+} t_input_test;
+
+typedef struct s_layer
+{
+  double weights[LAYER_SIZE];
+  double inputs[LAYER_SIZE];
+  double bias;
+} t_layer;
+
+// Training set:
+t_input_test tests[] = {
+  {{0, 0}, 0},
+  {{0, 1}, 1},
+  {{1, 0}, 1},
+  {{1, 1}, 0},
+};
+
+double sigmoid(double x)
+{
+  return 1. / (1. + exp(-x));
 }
 
-double derivative(double x) {
-  return x * (1 - x);
+double sigmoid_derivative(double x)
+{
+  return x * (1. - x);
 }
 
-double output(double in[], double w[], double bw) {
+double forward(double inputs[], double weights[], double bias)
+{
   double res = 0;
-  for(size_t i = 0; i < 2; ++i)
-    res += in[i] * w[i];
-  res += bw;
+
+  for(size_t i = 0; i < LAYER_SIZE; ++i)
+    res += inputs[i] * weights[i];
+  res += bias;
+
   return sigmoid(res);
 }
-int random_range(int max)
+
+int random_range(int min, int max)
 {
-  return rand() % max;
+  int diff = max-min;
+  return (int) (((double)(diff+1)/RAND_MAX) * rand() + min);
 }
 
-void train() {
-  double in[4][2] = {{0,0},{0,1},{1,0},{1,1}};
-  double res[4] = {0,1,1,0};
+double random_double(void)
+{
+  /* Gives a random double ranging from 0 to 1 */
 
-  // hidden neur 1
-  double weightN1[2], inputsN1[2], errN1, bwN1;
-  weightN1[0] = (double) rand() / (double) RAND_MAX;
-  weightN1[1] = (double) rand() / (double) RAND_MAX;
-  bwN1 = (double) rand() / (double) RAND_MAX;
+  return (double) rand() / (double) RAND_MAX;
+}
 
-  // hidden neur 2
-  double weightN2[2], inputsN2[2], errN2, bwN2;
-  weightN2[0] = (double) rand() / (double) RAND_MAX;
-  weightN2[1] = (double) rand() / (double) RAND_MAX;
-  bwN2 = (double) rand() / (double) RAND_MAX;
+void initialize_layer(t_layer *l)
+{
+  /* Initializes the layer weights and bias with random values */
 
-  // output 3
-  double weightN3[2], inputsN3[2], errN3, bwN3;
-  weightN3[0] = (double) rand() / (double) RAND_MAX;
-  weightN3[1] = (double) rand() / (double) RAND_MAX;
-  bwN3 = (double) rand() / (double) RAND_MAX;
+  for(size_t i = 0; i < LAYER_SIZE; ++i)
+    l->weights[i] = random_double();
+  l->bias = random_double();
+}
 
-  for(int epoch = 0; epoch < 2000 * 4; epoch++) {
-    int i = random_range(4);
-    inputsN1[0] = in[i][0];
-    inputsN1[1] = in[i][1];
-    inputsN2[0] = in[i][0];
-    inputsN2[1] = in[i][1];
+void backprop(t_layer *l, double err)
+{
+  /* Updates the layer weights and bias in function of the given error */
 
-    inputsN3[0] = output(inputsN1, weightN1, bwN1);
-    inputsN3[1] = output(inputsN2, weightN2, bwN2);
-
-    double outputN3 = output(inputsN3, weightN3, bwN3);
-
-    printf("%d XOR %d = ", (int)in[i][0], (int)in[i][1]);
-    printf("%f (%d)\n", outputN3, (int)res[i]);
-
-    errN3 = derivative(outputN3) * (res[i] - outputN3);
-    weightN3[0] += errN3 * inputsN3[0];
-    weightN3[1] += errN3 * inputsN3[1];
-    bwN3 += errN3;
-
-    errN1 = derivative(inputsN3[0]) * errN3 * weightN3[0];
-    errN2 = derivative(inputsN3[1]) * errN3 * weightN3[1];
-
-    weightN1[0] += errN1 * inputsN1[0];
-    weightN1[1] += errN1 * inputsN1[1];
-    bwN1 += errN1;
-
-    weightN2[0] += errN2 * inputsN2[0];
-    weightN2[1] += errN2 * inputsN2[1];
-    bwN2 += errN2;
-  }
+  for(size_t i = 0; i < LAYER_SIZE; ++i)
+    l->weights[i] += err * l->inputs[i];
+  l->bias += err;
 }
 
 int main() {
-  train();
+  // Build layers
+  t_layer layers[LAYER_SIZE];
+  for (size_t i = 0; i < LAYER_SIZE; i++)
+    initialize_layer(&layers[i]);
+
+  // Build output layer
+  t_layer output_layer;
+  initialize_layer(&output_layer);
+
+  for (size_t epoch = 0; epoch < 2000 * 4; epoch++)
+  {
+    // We give it a random test
+    t_input_test t = tests[random_range(1,4)];
+    printf("\n%d XOR %d ", (int)t.inputs[0], (int)t.inputs[1]);
+
+    // Feed the input layers with the inputs
+    for (size_t i = 0; i < LAYER_SIZE; i++)
+    {
+      t_layer l = layers[i];
+      for (size_t j = 0; j < LAYER_SIZE; j++)
+        l.inputs[j] = t.inputs[j];
+      output_layer.inputs[i] = forward(l.inputs, l.weights, l.bias);
+    }
+
+    // Determine the output
+    double output = forward(output_layer.inputs,
+                            output_layer.weights,
+                            output_layer.bias);
+    // Determine the error between what we found and the expected result
+    double output_err = sigmoid_derivative(output) * (t.result - output);
+
+    // Update output layer
+    printf("\n%f", output_layer.bias);
+    backprop(&output_layer, output_err);
+    printf(" %f\n", output_layer.bias);
+
+    // Update the neurons for intermediate layer
+    for (size_t i = 0; i < LAYER_SIZE; i++)
+    {
+      double err = sigmoid_derivative(output_layer.inputs[i])
+                 * output_err
+                 * output_layer.weights[i];
+
+      backprop(&layers[i], err);
+    }
+
+    printf("= %f(%d) (ERR:%f)\n", output, (int)t.result, output_err);
+  }
+
   return 0;
 }
