@@ -19,10 +19,9 @@ double output(double in[], double w[], double bw) {
   res += bw;
   return sigmoid(res);
 }
-int random_range(int min, int max)
+int random_range(int max)
 {
-  int diff = max-min;
-  return (int) (((double)(diff+1)/RAND_MAX) * rand() + min);
+  return rand() % max;
 }
 
 void train() {
@@ -48,7 +47,7 @@ void train() {
   bwN3 = (double) rand() / (double) RAND_MAX;
 
   for(int epoch = 0; epoch < 2000 * 4; epoch++) {
-    int i = random_range(1, 4);
+    int i = random_range(4);
     inputsN1[0] = in[i][0];
     inputsN1[1] = in[i][1];
     inputsN2[0] = in[i][0];
