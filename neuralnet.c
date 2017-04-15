@@ -62,8 +62,8 @@ void train() {
 
       double outputN3 = output(inputsN3, weightN3, bwN3);
 
-      printf("%f XOR %f = ", in[i][0], in[i][1]);
-      printf("%f\n", outputN3);
+      printf("%d XOR %d = ", (int)in[i][0], (int)in[i][1]);
+      printf("%f (%d)\n", outputN3, (int)res[i]);
 
       errN3 = derivative(outputN3) * (res[i] - outputN3);
       weightN3[0] += errN3 * inputsN3[0];
