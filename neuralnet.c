@@ -134,12 +134,12 @@ int main()
     for (size_t i = 0; i < NEURON_SIZE; i++)
     {
       // Feed the intermediate_layer
-      t_neuron l = intermediate_neurons[i];
+      t_neuron *l = &intermediate_neurons[i];
       for (size_t j = 0; j < NEURON_SIZE; j++)
-         l.inputs[j] = t.inputs[j];
+         l->inputs[j] = t.inputs[j];
 
       // Feed the output layer
-      output_neuron.inputs[i] = forward(&l);
+      output_neuron.inputs[i] = forward(l);
     }
 
     // Determine the output of the neural network
