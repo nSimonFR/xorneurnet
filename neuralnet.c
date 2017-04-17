@@ -124,8 +124,7 @@ int main()
   initialize_neuron(&output_neuron);
   /* END INIT */
 
-  for (size_t epoch = 0; epoch < 2000 * 16; epoch++)
-    // We will get ~2000 iterations for each input (Since it's randomly chosen)
+  for (size_t epoch = 0; epoch < 4000; epoch++)
   {
     // We give it a random test
     t_xor_set t = xor_set[RANDOM_RANGE(4)];
@@ -165,7 +164,7 @@ int main()
     }
     /* END BACKWARD */
 
-    printf("= %f(%d) (ERR:%f)\n", output, (int)t.result, output_err);
+    printf("= %d(%d) %f(ERR:%f)", output > 0.5, (int)t.result, output, output_err);
   }
 
   return 0;
