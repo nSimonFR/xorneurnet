@@ -8,10 +8,10 @@
  * But because this operation is non-trivial, we need an itermediate layer with
  * at least 2 neurons.
  *
- * It is decomposed in a set of 3 things:
+ * It is a SGD(Gradient Descent) using BackPropagation decomposed in 3 things:
  * The initialisation of the intermediate and output layers (INIT),
  * the feed of the neurons with the imputs to compute the result (FEEDFORWARD),
- * and the update of the weights and biases to improve learning (BACKPROP).
+ * and the update of the weights and biases to improve learning (BACKWARD).
  *
  * This code is not modular, so it only works for this special case
  * (But it is not hard making it so, I'm sure you can do it if you read the
