@@ -4,7 +4,7 @@
  *
  * Creates a neuralnetwork capable of recognizing a XOR
  * It has an input layer of size 2 (a XOR b)
- * And an input layer of size 1 (= c, as a probability)
+ * And an output layer of size 1 (= c, as a probability)
  * But because this operation is non-trivial, we need an itermediate layer with
  * at least 2 neurons.
  *
