@@ -100,13 +100,13 @@ double forward(t_neuron *n)
   return SIGMOID(result);
 }
 
-void backprop(t_neuron *n, double error)
+void backward(t_neuron *n, double error)
 {
   /* Updates the neuron weights and bias in function of the given error */
 
   for(size_t i = 0; i < NEURON_SIZE; i++)
-    n->weights[i] = error * n->inputs[i];
-  n->bias = error;
+    n->weights[i] += error * n->inputs[i];
+  n->bias += error;
 }
 
 int main()
@@ -115,9 +115,9 @@ int main()
 
   /* INIT */
   // Build intermediate layer
-  t_neuron neurons[NEURON_SIZE]; // == 2
+  t_neuron intermediate_neurons[NEURON_SIZE]; // == 2
   for (size_t i = 0; i < NEURON_SIZE; i++)
-    initialize_neuron(&neurons[i]);
+    initialize_neuron(&intermediate_neurons[i]);
 
   // Build output layer with one neuron
   t_neuron output_neuron;
@@ -135,7 +135,7 @@ int main()
     for (size_t i = 0; i < NEURON_SIZE; i++)
     {
       // Feed the intermediate_layer
-      t_neuron l = neurons[i];
+      t_neuron l = intermediate_neurons[i];
       for (size_t j = 0; j < NEURON_SIZE; j++)
          l.inputs[j] = t.inputs[j];
 
@@ -147,12 +147,12 @@ int main()
     double output = forward(&output_neuron);
     /* END FEEDFORWARD */
 
-    /* BACKPROP */
+    /* BACKWARD */
     // Determine the error between what we found and the expected result
     double output_err = SIGMOID_DERIV(output) * (t.result - output);
 
     // Update output neuron
-    backprop(&output_neuron, output_err);
+    backward(&output_neuron, output_err);
 
     // Update the neurons in the intermediate layer
     for (size_t i = 0; i < NEURON_SIZE; i++)
@@ -161,9 +161,9 @@ int main()
                  * output_err
                  * output_neuron.weights[i];
 
-      backprop(&neurons[i], err);
+      backward(&intermediate_neurons[i], err);
     }
-    /* END BACKPROP */
+    /* END BACKWARD */
 
     printf("= %f(%d) (ERR:%f)\n", output, (int)t.result, output_err);
   }
